@@ -9,6 +9,8 @@ backend/.venv
 backend/__pycache__
 backend/.pytest_cache
 backend/*.db
+backend/ml/artifacts/*.joblib
+backend/ml/artifacts/*.meta.json
 
 # OS
 .DS_Store
