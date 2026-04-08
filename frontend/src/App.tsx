@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import type { FormEvent } from "react";
 import "./App.css";
 
@@ -7,10 +7,36 @@ const API_BASE_URL =
 
 const TOKEN_STORAGE_KEY = "recharge_access_token";
 
+type BurnoutContributor = {
+  feature: string;
+  label: string;
+  shap: number;
+  share: number;
+  direction: "increases_risk" | "decreases_risk";
+};
+
+type BurnoutForecastPoint = {
+  day: number;
+  risk_score: number;
+};
+
+type BurnoutPredictResponse = {
+  risk_score: number;
+  risk_band: "low" | "moderate" | "high";
+  contributors: BurnoutContributor[];
+  days_to_high_risk: number | null;
+  projected_weekly_risk: BurnoutForecastPoint[];
+  warning_level: "stable" | "watch" | "warning" | "critical";
+  warning_message: string;
+  disclaimer: string;
+};
+
 function App() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [sessionToken, setSessionToken] = useState<string | null>(null);
+  const [sessionToken, setSessionToken] = useState<string | null>(() =>
+    localStorage.getItem(TOKEN_STORAGE_KEY),
+  );
   const [message, setMessage] = useState("Ready");
   const [burnoutForm, setBurnoutForm] = useState({
     date_of_joining: "2019-03-15",
@@ -21,12 +47,11 @@ function App() {
     resource_allocation: 6,
     mental_fatigue_score: 7,
   });
+  const [burnoutResult, setBurnoutResult] = useState<BurnoutPredictResponse | null>(
+    null,
+  );
 
   const isAuthenticated = useMemo(() => !!sessionToken, [sessionToken]);
-
-  useEffect(() => {
-    setSessionToken(localStorage.getItem(TOKEN_STORAGE_KEY));
-  }, []);
 
   const authJson = async (path: string, body: object) => {
     const response = await fetch(`${API_BASE_URL}${path}`, {
@@ -112,7 +137,13 @@ function App() {
       body: JSON.stringify(burnoutForm),
     });
     const json = (await response.json()) as Record<string, unknown>;
-    setMessage(JSON.stringify(json, null, 2));
+    if (!response.ok) {
+      setBurnoutResult(null);
+      setMessage(JSON.stringify(json, null, 2));
+      return;
+    }
+    setBurnoutResult(json as unknown as BurnoutPredictResponse);
+    setMessage("Burnout prediction updated.");
   };
 
   return (
@@ -281,6 +312,45 @@ function App() {
           POST /api/burnout/predict
         </button>
       </form>
+
+      {burnoutResult && (
+        <section className="card">
+          <h2>Burnout Tracker</h2>
+          <p className="subtitle">
+            Current risk: <strong>{Math.round(burnoutResult.risk_score * 100)}%</strong> (
+            {burnoutResult.risk_band})
+          </p>
+          <p className={`warning ${burnoutResult.warning_level}`}>
+            {burnoutResult.warning_message}
+          </p>
+          <p className="subtitle">
+            {burnoutResult.days_to_high_risk === null
+              ? "No high-risk crossing projected in the next 8 weeks."
+              : `Estimated high-risk crossing in ${burnoutResult.days_to_high_risk} days.`}
+          </p>
+
+          <h3>Risk trend (weekly)</h3>
+          <div className="trend">
+            {burnoutResult.projected_weekly_risk.map((point) => (
+              <div key={point.day} className="trendItem">
+                <span>Day {point.day}</span>
+                <strong>{Math.round(point.risk_score * 100)}%</strong>
+              </div>
+            ))}
+          </div>
+
+          <h3>Top contributors</h3>
+          <div className="contributors">
+            {burnoutResult.contributors.map((item) => (
+              <div key={item.feature} className="chip">
+                {item.label}: {item.direction === "increases_risk" ? "+" : "-"}
+                {item.share}%
+              </div>
+            ))}
+          </div>
+          <p className="subtitle">{burnoutResult.disclaimer}</p>
+        </section>
+      )}
 
       <pre className="output">{message}</pre>
     </main>

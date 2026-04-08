@@ -39,6 +39,60 @@ select {
   gap: 0.5rem;
 }
 
+.warning {
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
+  font-weight: 600;
+}
+
+.warning.stable {
+  background: #ecfdf5;
+  color: #065f46;
+}
+
+.warning.watch {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.warning.warning {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.warning.critical {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.trend {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 0.5rem;
+}
+
+.trendItem {
+  border: 1px solid #d0d7de;
+  border-radius: 8px;
+  padding: 0.5rem;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.contributors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.chip {
+  border: 1px solid #d0d7de;
+  border-radius: 999px;
+  padding: 0.3rem 0.65rem;
+  font-size: 0.88rem;
+  background: #f8fafc;
+}
+
 button {
   border: none;
   border-radius: 8px;

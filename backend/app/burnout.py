@@ -47,6 +47,10 @@ class BurnoutPredictOut(BaseModel):
     risk_score: float
     risk_band: str
     contributors: list[dict[str, Any]]
+    days_to_high_risk: int | None
+    projected_weekly_risk: list[dict[str, float | int]]
+    warning_level: str
+    warning_message: str
     disclaimer: str = (
         "Educational wellness screening only — not a medical diagnosis."
     )
@@ -74,4 +78,8 @@ def burnout_predict(
         risk_score=result.risk_score,
         risk_band=result.risk_band,
         contributors=result.contributors,
+        days_to_high_risk=result.days_to_high_risk,
+        projected_weekly_risk=result.projected_weekly_risk,
+        warning_level=result.warning_level,
+        warning_message=result.warning_message,
     )

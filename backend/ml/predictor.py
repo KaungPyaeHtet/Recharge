@@ -20,6 +20,10 @@ class BurnoutPrediction:
     risk_score: float
     risk_band: str
     contributors: list[dict[str, Any]]
+    days_to_high_risk: int | None
+    projected_weekly_risk: list[dict[str, float | int]]
+    warning_level: str
+    warning_message: str
 
 
 def _humanize_feature(name: str) -> str:
@@ -113,8 +117,80 @@ def predict_with_shap(
             }
         )
 
+    days_to_high_risk, projected_weekly_risk = _project_risk_curve(
+        bundle=bundle,
+        payload=payload,
+        reference_date=reference_date,
+    )
+    warning_level, warning_message = _warning_from_projection(
+        current_risk=proba,
+        days_to_high_risk=days_to_high_risk,
+    )
+
     return BurnoutPrediction(
         risk_score=round(proba, 4),
         risk_band=band,
         contributors=contributors,
+        days_to_high_risk=days_to_high_risk,
+        projected_weekly_risk=projected_weekly_risk,
+        warning_level=warning_level,
+        warning_message=warning_message,
     )
+
+
+def _project_risk_curve(
+    bundle: dict,
+    payload: dict,
+    reference_date: date,
+    horizon_days: int = 56,
+    step_days: int = 7,
+    target_high_risk: float = 0.65,
+) -> tuple[int | None, list[dict[str, float | int]]]:
+    """Build a simple near-term forecast by increasing fatigue and workload over time."""
+    pipe = bundle["pipeline"]
+    baseline_fatigue = float(payload["mental_fatigue_score"])
+    baseline_alloc = float(payload["resource_allocation"])
+    baseline_designation = float(payload["designation"])
+    join_date = pd.to_datetime(payload["date_of_joining"]).date()
+
+    first_day_cross: int | None = None
+    forecast: list[dict[str, float | int]] = []
+    for days_ahead in range(0, horizon_days + step_days, step_days):
+        fatigue_trend = min(10.0, baseline_fatigue + (days_ahead / 7.0) * 0.25)
+        allocation_trend = min(20.0, baseline_alloc + (days_ahead / 7.0) * 0.10)
+        # A small tenure-adjusted pressure factor (higher seniority tends to absorb less increase).
+        designation_relief = max(0.85, 1.0 - (baseline_designation * 0.01))
+        fatigue_trend = min(10.0, fatigue_trend * designation_relief)
+
+        row_payload = {
+            **payload,
+            "date_of_joining": join_date.isoformat(),
+            "mental_fatigue_score": fatigue_trend,
+            "resource_allocation": allocation_trend,
+        }
+        X_step = row_from_payload(
+            row_payload,
+            reference_date=reference_date
+            if days_ahead == 0
+            else date.fromordinal(reference_date.toordinal() + days_ahead),
+        )
+        step_risk = float(pipe.predict_proba(X_step)[0, 1])
+        forecast.append({"day": days_ahead, "risk_score": round(step_risk, 4)})
+
+        if first_day_cross is None and step_risk >= target_high_risk:
+            first_day_cross = days_ahead
+
+    return first_day_cross, forecast
+
+
+def _warning_from_projection(
+    current_risk: float,
+    days_to_high_risk: int | None,
+) -> tuple[str, str]:
+    if current_risk >= 0.65:
+        return "critical", "High burnout risk now. Trigger immediate support and workload reduction."
+    if days_to_high_risk is not None and days_to_high_risk <= 14:
+        return "warning", "Burnout risk is projected to become high within 2 weeks."
+    if days_to_high_risk is not None and days_to_high_risk <= 28:
+        return "watch", "Burnout risk trend is rising and may become high this month."
+    return "stable", "No near-term high-risk signal. Keep monitoring weekly."
