@@ -19,16 +19,18 @@ async def lifespan(_app: FastAPI):
 
 app = FastAPI(title=settings.app_name, lifespan=lifespan)
 
-app.include_router(auth_router)
-app.include_router(burnout_router)
-
+# CORS must be registered before routers so it wraps the full middleware stack.
+_allowed_origins = [o.strip() for o in settings.frontend_url.split(",") if o.strip()]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.frontend_url],
+    allow_origins=_allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(auth_router)
+app.include_router(burnout_router)
 
 
 @app.get("/api/health")

@@ -17,7 +17,8 @@ class Settings(BaseSettings):
 
     app_name: str = "recharge-api"
     app_env: str = "development"
-    frontend_url: str = "http://localhost:5173"
+    # Comma-separated list of allowed origins, e.g. "http://localhost:5173,http://localhost:5174"
+    frontend_url: str = "http://localhost:5173,http://localhost:5174,http://127.0.0.1:5173,http://127.0.0.1:5174"
     database_url: str = Field(default_factory=_default_database_url)
     jwt_secret: str = "dev-only-change-me-use-long-random-string-in-production"
     jwt_algorithm: str = "HS256"
