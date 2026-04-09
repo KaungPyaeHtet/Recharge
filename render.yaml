@@ -1,9 +1,8 @@
 services:
   - type: web
-    name: recharge-backend
+    name: recharge
     runtime: docker
-    dockerfilePath: ./backend/Dockerfile
-    dockerContext: ./backend
+    # Render detects the root Dockerfile automatically
     plan: free
     healthCheckPath: /api/health
     disk:
@@ -17,23 +16,5 @@ services:
         value: production
       - key: DATABASE_URL
         value: sqlite:////app/data/app.db
-      # After deploying the frontend, set this to your frontend's Render URL
-      # e.g. https://recharge-frontend.onrender.com
       - key: FRONTEND_URL
-        sync: false
-
-  - type: web
-    name: recharge-frontend
-    runtime: static
-    rootDir: frontend
-    buildCommand: npm ci && npm run build
-    staticPublishPath: ./dist
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
-    envVars:
-      # Set this to your backend's Render URL after the backend service is created
-      # e.g. https://recharge-backend.onrender.com
-      - key: VITE_API_BASE_URL
-        sync: false
+        value: https://recharge.onrender.com

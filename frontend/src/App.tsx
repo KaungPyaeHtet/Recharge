@@ -4,7 +4,7 @@ import "./App.css";
 import { RISK_COLORS, WARNING_STYLES, cleanLabel, riskBand } from "./utils";
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
+  import.meta.env.VITE_API_BASE_URL ?? "";
 
 const TOKEN_STORAGE_KEY = "recharge_access_token";
 

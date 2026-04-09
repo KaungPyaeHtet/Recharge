@@ -1,0 +1,16 @@
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+backend/__pycache__/
+backend/**/__pycache__/
+backend/*.pyc
+backend/.env
+backend/.venv/
+backend/venv/
+backend/*.db
+backend/app.db
+backend/tests/
+backend/.pytest_cache/
+.git/
+.gitignore
+*.md

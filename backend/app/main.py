@@ -1,7 +1,9 @@
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 
 from .auth import get_current_user
 from .auth_routes import router as auth_router
@@ -49,3 +51,15 @@ def health() -> dict[str, str]:
 @app.get("/api/me")
 def me(current_user: dict = Depends(get_current_user)) -> dict[str, dict]:
     return {"user": current_user}
+
+
+# ── Serve bundled React frontend (production) ─────────────────────────────────
+_FRONTEND_DIST = Path(__file__).resolve().parent.parent / "frontend_dist"
+
+
+@app.get("/{full_path:path}", include_in_schema=False)
+def serve_spa(full_path: str) -> FileResponse:
+    candidate = _FRONTEND_DIST / full_path
+    if candidate.is_file():
+        return FileResponse(candidate)
+    return FileResponse(_FRONTEND_DIST / "index.html")
