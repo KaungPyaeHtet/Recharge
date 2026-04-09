@@ -1,0 +1,25 @@
+{
+  "target_col": "Burn Rate",
+  "date_col": "Date of Joining",
+  "cat_cols": [
+    "Gender",
+    "Company Type",
+    "WFH Setup Available"
+  ],
+  "num_cols": [
+    "Designation",
+    "Resource Allocation",
+    "Mental Fatigue Score",
+    "tenure_days"
+  ],
+  "reference_date": "2008-12-31",
+  "burn_threshold": 0.5,
+  "positive_class_label": "high_burnout_risk",
+  "metrics": {
+    "f1": 0.9220272904483431,
+    "roc_auc": 0.9849429473461928,
+    "report": "              precision    recall  f1-score   support\n\n           0       0.94      0.95      0.94      2165\n           1       0.93      0.91      0.92      1553\n\n    accuracy                           0.94      3718\n   macro avg       0.93      0.93      0.93      3718\nweighted avg       0.94      0.94      0.94      3718\n",
+    "positive_rate_train": 0.4176304464766003,
+    "positive_rate_test": 0.41769768692845616
+  }
+}
