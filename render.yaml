@@ -2,7 +2,6 @@ services:
   - type: web
     name: recharge
     runtime: docker
-    # Render detects the root Dockerfile automatically
     plan: free
     healthCheckPath: /api/health
     disk:
@@ -16,5 +15,3 @@ services:
         value: production
       - key: DATABASE_URL
         value: sqlite:////app/data/app.db
-      - key: FRONTEND_URL
-        value: https://recharge.onrender.com

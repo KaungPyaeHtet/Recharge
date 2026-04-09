@@ -25,15 +25,25 @@ async def lifespan(_app: FastAPI):
 
 app = FastAPI(title=settings.app_name, lifespan=lifespan)
 
-# CORS must be registered before routers so it wraps the full middleware stack.
-_allowed_origins = [o.strip() for o in settings.frontend_url.split(",") if o.strip()]
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=_allowed_origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# CORS: in production the frontend is served from the same origin (bundled),
+# so we open all origins. In dev, restrict to the configured FRONTEND_URL(s).
+if settings.app_env == "production":
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=False,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+else:
+    _dev_origins = [o.strip() for o in settings.frontend_url.split(",") if o.strip()]
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=_dev_origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
 app.include_router(auth_router)
 app.include_router(burnout_router)
