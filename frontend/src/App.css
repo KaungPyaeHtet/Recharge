@@ -194,6 +194,29 @@
   transform: none;
 }
 
+.btn-secondary {
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  font-family: inherit;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--bg-alt);
+  border-color: var(--text-muted);
+}
+
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .btn-lg {
   padding: 0.8rem 1.75rem;
   font-size: 1rem;
@@ -940,4 +963,136 @@
   height: 5px;
   border-radius: 50%;
   background: var(--accent);
+}
+
+/* Wellness / habits */
+.analyze-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.subsection-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.subsection-hint {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.wellness-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: flex-end;
+}
+
+.hobby-input {
+  flex: 1;
+  min-width: 180px;
+}
+
+.log-textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 72px;
+  font-family: inherit;
+  font-size: 0.88rem;
+}
+
+.field-label-inline {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.lookback-input {
+  width: 4.5rem;
+}
+
+.hobby-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.hobby-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.5rem;
+  background: var(--accent-light);
+  border: 1px solid #fde68a;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.hobby-chip-remove {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0 0.15rem;
+  font-size: 1.1rem;
+  line-height: 1;
+  color: var(--text-secondary);
+}
+
+.hobby-chip-remove:hover {
+  color: var(--text-primary);
+}
+
+.wellness-toast {
+  font-size: 0.82rem;
+  color: var(--accent-hover);
+  margin: 0;
+  font-weight: 600;
+}
+
+.wellness-insights {
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  background: var(--bg-alt);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.wellness-summary {
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem;
+  line-height: 1.45;
+}
+
+.fatigue-adjust {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.5rem;
+}
+
+.logs-used {
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.habit-insight-list {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.habit-insight-list li {
+  margin-bottom: 0.35rem;
 }

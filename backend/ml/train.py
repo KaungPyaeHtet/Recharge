@@ -34,6 +34,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder
 from xgboost import XGBClassifier
 
+from ml.dataset_normalize import detect_format, normalize_to_training_schema
 from ml.schema_cols import CAT_COLS, DATE_COL, NUM_COLS, TARGET_COL
 from ml.synthetic import generate_burnout_csv
 
@@ -133,6 +134,7 @@ def train_from_dataframe(df: pd.DataFrame, burn_threshold: float = 0.5) -> tuple
         "burn_threshold": burn_threshold,
         "positive_class_label": "high_burnout_risk",
         "metrics": metrics,
+        "dataset_format": "hackerearth_schema",
     }
 
     bundle = {"pipeline": pipe, "meta": meta}
@@ -157,14 +159,42 @@ def main() -> None:
         "--threshold",
         type=float,
         default=0.5,
-        help="Burn rate threshold for binary positive class",
+        help=(
+            "Threshold for positive class: Burn Rate 0–1, or normalized burnout level"
+        ),
+    )
+    parser.add_argument(
+        "--format",
+        choices=["auto", "hackerearth", "mental_health"],
+        default="auto",
+        help=(
+            "CSV column layout: hackerearth = already canonical; "
+            "mental_health = Kaggle mental-health & burnout workplace aliases; "
+            "auto = detect"
+        ),
     )
     args = parser.parse_args()
 
     if args.synthetic:
         df = generate_burnout_csv()
     elif args.csv:
-        df = pd.read_csv(args.csv)
+        raw = pd.read_csv(args.csv)
+        if args.format == "hackerearth":
+            df = raw
+        elif args.format == "mental_health":
+            df = normalize_to_training_schema(raw)
+        else:
+            kind = detect_format(raw)
+            if kind == "ready":
+                df = raw
+            elif kind == "alias":
+                df = normalize_to_training_schema(raw)
+            else:
+                raise SystemExit(
+                    "Could not infer CSV format. Use --format mental_health or "
+                    "--format hackerearth. Columns: "
+                    + ", ".join(map(str, raw.columns.tolist()))
+                )
     else:
         raise SystemExit("Provide --csv PATH or --synthetic")
 

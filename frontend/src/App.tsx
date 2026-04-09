@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
 import "./App.css";
 import { RISK_COLORS, WARNING_STYLES, cleanLabel, riskBand } from "./utils";
@@ -31,6 +31,17 @@ type BurnoutPredictResponse = {
   warning_message: string;
   disclaimer: string;
 };
+
+/** Extended when calling POST /api/wellness/burnout-preview */
+type WellnessBurnoutResult = BurnoutPredictResponse & {
+  mental_fatigue_base?: number;
+  mental_fatigue_adjusted?: number;
+  daily_signal_summary?: string;
+  habit_insights?: string[];
+  logs_used?: number;
+};
+
+type HobbyRow = { id: string; name: string };
 
 function RiskGauge({ score }: { score: number }) {
   const pct = Math.round(score * 100);
@@ -116,11 +127,40 @@ function App() {
     resource_allocation: 6,
     mental_fatigue_score: 7,
   });
-  const [burnoutResult, setBurnoutResult] = useState<BurnoutPredictResponse | null>(null);
+  const [burnoutResult, setBurnoutResult] = useState<WellnessBurnoutResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [hobbies, setHobbies] = useState<HobbyRow[]>([]);
+  const [hobbyName, setHobbyName] = useState("");
+  const [logNote, setLogNote] = useState("");
+  const [logPolarity, setLogPolarity] = useState<"" | "plus" | "minus" | "neutral">("");
+  const [lookbackDays, setLookbackDays] = useState(14);
+  const [wellnessMsg, setWellnessMsg] = useState("");
 
   const isAuthenticated = useMemo(() => !!sessionToken, [sessionToken]);
+
+  useEffect(() => {
+    if (!sessionToken) {
+      setHobbies([]);
+      return;
+    }
+    let cancelled = false;
+    void (async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/wellness/hobbies`, {
+          headers: { Authorization: `Bearer ${sessionToken}` },
+        });
+        if (!res.ok || cancelled) return;
+        const data = (await res.json()) as HobbyRow[];
+        if (!cancelled) setHobbies(data);
+      } catch {
+        /* ignore */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [sessionToken]);
 
   const authJson = async (path: string, body: object) => {
     const response = await fetch(`${API_BASE_URL}${path}`, {
@@ -169,6 +209,7 @@ function App() {
     e.preventDefault();
     if (!sessionToken) return;
     setLoading(true);
+    setWellnessMsg("");
     try {
       const response = await fetch(`${API_BASE_URL}/api/burnout/predict`, {
         method: "POST",
@@ -180,7 +221,87 @@ function App() {
       });
       const json = (await response.json()) as Record<string, unknown>;
       if (response.ok) {
-        setBurnoutResult(json as unknown as BurnoutPredictResponse);
+        setBurnoutResult(json as unknown as WellnessBurnoutResult);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addHobby = async () => {
+    const name = hobbyName.trim();
+    if (!sessionToken || !name) return;
+    const res = await fetch(`${API_BASE_URL}/api/wellness/hobbies`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${sessionToken}`,
+      },
+      body: JSON.stringify({ name }),
+    });
+    if (res.ok) {
+      const row = (await res.json()) as HobbyRow;
+      setHobbies((h) => [...h, row]);
+      setHobbyName("");
+      setWellnessMsg(`Saved hobby “${row.name}”.`);
+    }
+  };
+
+  const removeHobby = async (id: string) => {
+    if (!sessionToken) return;
+    const res = await fetch(`${API_BASE_URL}/api/wellness/hobbies/${id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${sessionToken}` },
+    });
+    if (res.ok) {
+      setHobbies((h) => h.filter((x) => x.id !== id));
+      setWellnessMsg("Hobby removed.");
+    }
+  };
+
+  const saveDailyLog = async () => {
+    const text = logNote.trim();
+    if (!sessionToken || !text) return;
+    const body: { text: string; polarity?: string } = { text };
+    if (logPolarity) body.polarity = logPolarity;
+    const res = await fetch(`${API_BASE_URL}/api/wellness/logs`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${sessionToken}`,
+      },
+      body: JSON.stringify(body),
+    });
+    if (res.ok) {
+      setLogNote("");
+      setLogPolarity("");
+      setWellnessMsg("Check-in saved. Run “Analyze with wellness” to fold it into risk.");
+    } else {
+      setWellnessMsg("Could not save check-in.");
+    }
+  };
+
+  const predictBurnoutWithWellness = async () => {
+    if (!sessionToken) return;
+    setLoading(true);
+    setWellnessMsg("");
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/wellness/burnout-preview`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionToken}`,
+        },
+        body: JSON.stringify({
+          work_profile: burnoutForm,
+          lookback_days: lookbackDays,
+        }),
+      });
+      const json = (await response.json()) as Record<string, unknown>;
+      if (response.ok) {
+        setBurnoutResult(json as unknown as WellnessBurnoutResult);
+      } else {
+        setWellnessMsg(typeof json["detail"] === "string" ? json["detail"] : "Preview failed.");
       }
     } finally {
       setLoading(false);
@@ -530,15 +651,102 @@ function App() {
               ))}
             </div>
 
-            <button className="btn-primary btn-full" type="submit" disabled={loading}>
-              {loading ? (
-                <span className="loading-dots">
-                  Analyzing<span>.</span><span>.</span><span>.</span>
-                </span>
-              ) : (
-                "Analyze Burnout Risk"
-              )}
-            </button>
+            <div className="analyze-actions">
+              <button className="btn-primary btn-full" type="submit" disabled={loading}>
+                {loading ? (
+                  <span className="loading-dots">
+                    Analyzing<span>.</span><span>.</span><span>.</span>
+                  </span>
+                ) : (
+                  "Analyze (profile only)"
+                )}
+              </button>
+              <button
+                className="btn-secondary btn-full"
+                type="button"
+                disabled={loading}
+                onClick={() => void predictBurnoutWithWellness()}
+              >
+                Analyze with wellness &amp; habits
+              </button>
+            </div>
+
+            <div className="divider" />
+            <h3 className="subsection-title">Hobbies &amp; daily check-in</h3>
+            <p className="subsection-hint">
+              Set activities you want to keep (guitar, running, reading). Each day, jot what you did
+              — we use light keyword NLP plus optional &quot;+ / -&quot; labels. The wellness run adjusts
+              fatigue from your notes and flags habit slip.
+            </p>
+            <div className="wellness-row">
+              <input
+                className="field-input hobby-input"
+                placeholder="e.g. piano, climbing, journaling"
+                value={hobbyName}
+                onChange={(e) => setHobbyName(e.target.value)}
+              />
+              <button type="button" className="btn-secondary" onClick={() => void addHobby()}>
+                Add hobby
+              </button>
+            </div>
+            {hobbies.length > 0 && (
+              <div className="hobby-chips">
+                {hobbies.map((h) => (
+                  <span key={h.id} className="hobby-chip">
+                    {h.name}
+                    <button
+                      type="button"
+                      className="hobby-chip-remove"
+                      aria-label={`Remove ${h.name}`}
+                      onClick={() => void removeHobby(h.id)}
+                    >
+                      &times;
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+            <textarea
+              className="field-input log-textarea"
+              placeholder="Today: e.g. worked late, skipped gym, 20m walk at lunch..."
+              value={logNote}
+              onChange={(e) => setLogNote(e.target.value)}
+              rows={3}
+            />
+            <div className="wellness-row">
+              <label className="field-label-inline">
+                Day felt like
+                <select
+                  className="field-input"
+                  value={logPolarity}
+                  onChange={(e) =>
+                    setLogPolarity(
+                      e.target.value as "" | "plus" | "minus" | "neutral",
+                    )
+                  }
+                >
+                  <option value="">Auto (NLP from text)</option>
+                  <option value="plus">Good / recharging (+)</option>
+                  <option value="minus">Hard / draining (-)</option>
+                  <option value="neutral">Neutral</option>
+                </select>
+              </label>
+              <label className="field-label-inline">
+                Look back (days)
+                <input
+                  className="field-input lookback-input"
+                  type="number"
+                  min={1}
+                  max={90}
+                  value={lookbackDays}
+                  onChange={(e) => setLookbackDays(Number(e.target.value))}
+                />
+              </label>
+              <button type="button" className="btn-secondary" onClick={() => void saveDailyLog()}>
+                Save check-in
+              </button>
+            </div>
+            {wellnessMsg && <p className="wellness-toast">{wellnessMsg}</p>}
           </form>
 
           {/* Results Panel */}
@@ -557,6 +765,31 @@ function App() {
                 >
                   {burnoutResult.warning_message}
                 </div>
+                {burnoutResult.logs_used !== undefined && (
+                  <div className="wellness-insights">
+                    <p className="wellness-summary">{burnoutResult.daily_signal_summary}</p>
+                    {burnoutResult.mental_fatigue_base !== undefined &&
+                      burnoutResult.mental_fatigue_adjusted !== undefined && (
+                        <p className="fatigue-adjust">
+                          Fatigue in form: <strong>{burnoutResult.mental_fatigue_base.toFixed(1)}</strong>
+                          {" → "}
+                          model input:{" "}
+                          <strong>{burnoutResult.mental_fatigue_adjusted.toFixed(1)}</strong>
+                          {" "}
+                          <span className="logs-used">
+                            ({burnoutResult.logs_used} check-ins in window)
+                          </span>
+                        </p>
+                      )}
+                    {burnoutResult.habit_insights && burnoutResult.habit_insights.length > 0 && (
+                      <ul className="habit-insight-list">
+                        {burnoutResult.habit_insights.map((line, i) => (
+                          <li key={`${i}-${line.slice(0, 48)}`}>{line}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                )}
                 {burnoutResult.days_to_high_risk !== null && (
                   <p className="forecast-note">
                     High-risk threshold in{" "}

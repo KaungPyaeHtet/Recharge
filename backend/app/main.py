@@ -6,9 +6,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from .auth import get_current_user
 from .auth_routes import router as auth_router
 from .burnout import router as burnout_router
+from .wellness_routes import router as wellness_router
 from .config import settings
 from .database import Base, engine
-from .models import User  # noqa: F401 — registers ``users`` with SQLAlchemy metadata
+from .models import DailyActivityLog, Hobby, User  # noqa: F401 — register tables
 
 
 @asynccontextmanager
@@ -31,6 +32,7 @@ app.add_middleware(
 
 app.include_router(auth_router)
 app.include_router(burnout_router)
+app.include_router(wellness_router)
 
 
 @app.get("/api/health")

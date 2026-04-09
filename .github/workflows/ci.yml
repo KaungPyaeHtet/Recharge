@@ -34,7 +34,11 @@ jobs:
         run: |
           python - <<'PY'
           from app.main import app
+          from app.wellness_routes import router as _wellness_router
+          from ml.dataset_normalize import detect_format
           from ml.predictor import row_from_payload
+          assert _wellness_router.prefix == "/api/wellness"
+          assert callable(detect_format)
           assert app.title
           payload = {
               "date_of_joining": "2024-01-01",
