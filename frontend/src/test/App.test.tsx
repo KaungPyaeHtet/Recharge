@@ -178,7 +178,7 @@ describe('Dashboard (authenticated)', () => {
   it('renders the assessment form', () => {
     render(<App />)
     expect(screen.getByText(/burnout risk assessment/i)).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /analyze burnout risk/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^analyze$/i })).toBeInTheDocument()
   })
 
   it('shows Sign out button in nav', () => {
@@ -200,7 +200,11 @@ describe('Dashboard (authenticated)', () => {
   })
 
   it('displays risk score and cleaned contributor labels after analysis', async () => {
-    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
+    const mockFetch = vi.spyOn(globalThis, 'fetch')
+    // First call: hobbies load on mount (authenticated)
+    mockFetch.mockResolvedValueOnce(new Response(JSON.stringify([]), { status: 200 }))
+    // Second call: predict
+    mockFetch.mockResolvedValueOnce(
       new Response(
         JSON.stringify({
           risk_score: 0.9,
@@ -228,7 +232,7 @@ describe('Dashboard (authenticated)', () => {
     )
 
     render(<App />)
-    fireEvent.click(screen.getByRole('button', { name: /analyze burnout risk/i }))
+    fireEvent.click(screen.getByRole('button', { name: /^analyze$/i }))
 
     await waitFor(() =>
       expect(screen.getAllByText('90%').length).toBeGreaterThanOrEqual(1)

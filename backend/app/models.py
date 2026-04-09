@@ -1,7 +1,7 @@
 import uuid
 from datetime import date, datetime, timezone
 
-from sqlalchemy import Date, DateTime, ForeignKey, String, Text, Uuid
+from sqlalchemy import Date, DateTime, Float, ForeignKey, String, Text, Uuid
 from sqlalchemy.orm import Mapped, mapped_column
 
 from .database import Base
@@ -61,4 +61,58 @@ class DailyActivityLog(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=_utc_now,
+    )
+
+
+class UserProfile(Base):
+    """Stored work profile (friendly answers that map to ML inputs)."""
+
+    __tablename__ = "user_profiles"
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid,
+        ForeignKey("users.id", ondelete="CASCADE"),
+        unique=True,
+        index=True,
+    )
+    date_of_joining: Mapped[str] = mapped_column(String(20))
+    gender: Mapped[str] = mapped_column(String(16))
+    company_type: Mapped[str] = mapped_column(String(16))
+    wfh_setup_available: Mapped[str] = mapped_column(String(4))
+    role_level: Mapped[str] = mapped_column(String(32))
+    hours_per_day: Mapped[str] = mapped_column(String(32))
+    evening_work: Mapped[str] = mapped_column(String(32))
+    projects_count: Mapped[str] = mapped_column(String(32))
+    end_of_day: Mapped[str] = mapped_column(String(32))
+    switch_off: Mapped[str] = mapped_column(String(32))
+    sleep_worries: Mapped[str] = mapped_column(String(32))
+    exercise: Mapped[str] = mapped_column(String(32))
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=_utc_now,
+    )
+
+
+class AssessmentResult(Base):
+    """Persisted burnout/risk prediction snapshot for a user."""
+
+    __tablename__ = "assessment_results"
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid,
+        ForeignKey("users.id", ondelete="CASCADE"),
+        index=True,
+    )
+    mode: Mapped[str] = mapped_column(String(32))          # "professional" | "student"
+    risk_score: Mapped[float] = mapped_column(Float)
+    risk_band: Mapped[str] = mapped_column(String(16))
+    warning_level: Mapped[str] = mapped_column(String(16))
+    payload_json: Mapped[str] = mapped_column(Text)        # JSON of input fields
+    contributors_json: Mapped[str] = mapped_column(Text, default="[]")
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=_utc_now,
+        index=True,
     )

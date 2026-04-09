@@ -7,9 +7,12 @@ from .auth import get_current_user
 from .auth_routes import router as auth_router
 from .burnout import router as burnout_router
 from .wellness_routes import router as wellness_router
+from .student_routes import router as student_router
+from .assessment_routes import router as assessment_router
+from .profile_routes import router as profile_router
 from .config import settings
 from .database import Base, engine
-from .models import DailyActivityLog, Hobby, User  # noqa: F401 — register tables
+from .models import AssessmentResult, DailyActivityLog, Hobby, User, UserProfile  # noqa: F401  # pyright: ignore[reportUnusedImport]
 
 
 @asynccontextmanager
@@ -33,11 +36,14 @@ app.add_middleware(
 app.include_router(auth_router)
 app.include_router(burnout_router)
 app.include_router(wellness_router)
+app.include_router(student_router)
+app.include_router(assessment_router)
+app.include_router(profile_router)
 
 
 @app.get("/api/health")
 def health() -> dict[str, str]:
-    return {"status": "ok", "env": settings.app_env}
+    return {"status": "ok"}
 
 
 @app.get("/api/me")
