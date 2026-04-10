@@ -246,7 +246,7 @@ function ProfilePage({
         <div>
           <h1 className="dash-title">Work Profile</h1>
           <p className="dash-sub">
-            Fill this in once. We use it to compute your burnout risk — update any time.
+            Fill this in once. We use it to compute your burnout risk. Update any time.
           </p>
         </div>
         <button
@@ -284,8 +284,8 @@ function ProfilePage({
             <div className="field">
               <label className="field-label">What best describes you?</label>
               <select className="field-input" value={form.company_type} onChange={(e) => set("company_type", e.target.value)}>
-                <option value="Service">Employee — Service (consulting, agency)</option>
-                <option value="Product">Employee — Product (tech, SaaS)</option>
+                <option value="Service">Employee: Service (consulting, agency)</option>
+                <option value="Product">Employee: Product (tech, SaaS)</option>
                 <option value="Student">Student (university, bootcamp)</option>
               </select>
             </div>
@@ -442,7 +442,7 @@ function RiskLineChart({ items }: { items: AssessmentOut[] }) {
   if (sorted.length === 0) {
     return (
       <p className="history-empty-inline">
-        No assessments yet — run an analysis to start tracking.
+        No assessments yet. Run an analysis to start tracking.
       </p>
     );
   }
@@ -554,7 +554,7 @@ function RiskLineChart({ items }: { items: AssessmentOut[] }) {
           return (
             <g key={a.id}>
               <circle cx={cx} cy={cy} r="4" fill={color} stroke="#fff" strokeWidth="1.5" />
-              <title>{`${Math.round(a.risk_score * 100)}% ${a.risk_band} — ${lbl}`}</title>
+              <title>{`${Math.round(a.risk_score * 100)}% ${a.risk_band} (${lbl})`}</title>
               {i % labelEvery === 0 && (
                 <text
                   x={cx}
@@ -642,7 +642,7 @@ function HistoryPage({
         <div>
           <h1 className="dash-title">Risk History</h1>
           <p className="dash-sub">
-            Your burnout trend over time — updates every time you run an analysis.
+            Your burnout trend over time. Updates every time you run an analysis.
           </p>
         </div>
         {latest && (
@@ -1097,7 +1097,7 @@ function App() {
       if (res.ok) {
         setLogNote("");
         setDailyQ({ energy: "", sleep: "", stress: "", breaks: "" });
-        showMsg("Check-in saved — your next analysis will include it.");
+        showMsg("Check-in saved. Your next analysis will include it.");
       } else {
         showMsg("Couldn't save check-in. Please try again.", "error");
       }
@@ -1411,7 +1411,7 @@ function App() {
             <div>
               <h1 className="dash-title">Burnout Risk Assessment</h1>
               <p className="dash-sub">
-                {userProfile ? "Your work profile is loaded — add a check-in and analyze." : "Set up your work profile to get a personalized risk score."}
+                {userProfile ? "Your work profile is loaded. Add a check-in and analyze." : "Set up your work profile to get a personalized risk score."}
               </p>
             </div>
             {burnoutResult && (
@@ -1550,7 +1550,7 @@ function App() {
               <div className="divider" />
               <h3 className="subsection-title">Hobbies &amp; notes</h3>
               <p className="subsection-hint">
-                Add hobbies you want to protect. Jot extra notes below — we auto-detect mood and flag habit slip when you Analyze.
+                Add hobbies you want to protect. Jot extra notes below; we auto-detect mood and flag habit slip when you Analyze.
               </p>
               <div className="wellness-row">
                 <input
@@ -1653,7 +1653,7 @@ function App() {
                   </div>
                   {burnoutResult.logs_used !== undefined && (
                     <div className="wellness-insights">
-                      {/* Daily signal notes — what the check-in questions changed */}
+                      {/* Daily signal notes: what the check-in questions changed */}
                       {burnoutResult.daily_signal_notes && burnoutResult.daily_signal_notes.length > 0 && (
                         <div className="signal-notes">
                           <span className="signal-notes-label">Today&apos;s check-in adjustments</span>

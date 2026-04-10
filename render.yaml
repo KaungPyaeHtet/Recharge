@@ -4,14 +4,16 @@ services:
     runtime: docker
     plan: free
     healthCheckPath: /api/health
-    disk:
-      name: recharge-db
-      mountPath: /app/data
-      sizeGB: 1
     envVars:
       - key: JWT_SECRET
         generateValue: true
       - key: APP_ENV
         value: production
       - key: DATABASE_URL
-        value: sqlite:////app/data/app.db
+        fromDatabase:
+          name: recharge-db
+          property: connectionString
+
+databases:
+  - name: recharge-db
+    plan: free

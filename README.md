@@ -158,6 +158,81 @@ Open [http://localhost:5173](http://localhost:5173).
 
 4. **History** — view your risk trend as a line chart over time, plus all past daily logs.
 
+## Deploying to Vercel
+
+The backend and frontend are deployed as two separate Vercel projects.
+
+### Database (required before deploying backend)
+
+SQLite doesn't work on Vercel's serverless runtime. You need a hosted PostgreSQL database.
+
+1. Create a free account at [neon.tech](https://neon.tech)
+2. Create a new project and copy the connection string — it looks like:
+   ```
+   postgresql://user:password@ep-xxx.us-east-1.aws.neon.tech/neondb?sslmode=require
+   ```
+3. You'll paste this as `DATABASE_URL` when setting up the backend below.
+
+---
+
+### Deploy the Backend
+
+1. Go to [vercel.com](https://vercel.com) → **Add New Project** → import your repo
+2. Set **Root Directory** to `backend`
+3. Vercel will auto-detect Python. No build command needed.
+4. Add these **Environment Variables** in the Vercel project settings:
+
+   | Variable | Value |
+   |----------|-------|
+   | `JWT_SECRET` | A long random string (e.g. output of `openssl rand -hex 32`) |
+   | `DATABASE_URL` | Your Neon PostgreSQL connection string |
+   | `FRONTEND_URL` | Your frontend Vercel URL (set after deploying frontend, or update later) |
+   | `APP_ENV` | `production` |
+
+5. Click **Deploy**. Note the backend URL (e.g. `https://recharge-api.vercel.app`).
+
+---
+
+### Deploy the Frontend
+
+1. **Add New Project** → same repo
+2. Set **Root Directory** to `frontend`
+3. Add this **Environment Variable**:
+
+   | Variable | Value |
+   |----------|-------|
+   | `VITE_API_BASE_URL` | Your backend Vercel URL from the step above |
+
+4. Click **Deploy**.
+
+---
+
+### Connect them together
+
+After both are deployed:
+
+1. Copy the frontend URL (e.g. `https://recharge.vercel.app`)
+2. Go to the **backend** Vercel project → Settings → Environment Variables
+3. Update `FRONTEND_URL` to the frontend URL
+4. **Redeploy** the backend so the CORS setting takes effect
+
+---
+
+### Redeploy after code changes
+
+Push to `main` — Vercel auto-deploys both projects via the Git integration.
+
+To deploy manually:
+```bash
+npm install -g vercel
+
+# Deploy backend
+cd backend && vercel --prod
+
+# Deploy frontend
+cd frontend && vercel --prod
+```
+
 ## Running Tests
 
 ```bash

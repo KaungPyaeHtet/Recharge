@@ -12,14 +12,15 @@
     "Mental Fatigue Score",
     "tenure_days"
   ],
-  "reference_date": "2008-12-31",
+  "reference_date": "2022-12-29",
   "burn_threshold": 0.5,
   "positive_class_label": "high_burnout_risk",
   "metrics": {
-    "f1": 0.9220272904483431,
-    "roc_auc": 0.9849429473461928,
-    "report": "              precision    recall  f1-score   support\n\n           0       0.94      0.95      0.94      2165\n           1       0.93      0.91      0.92      1553\n\n    accuracy                           0.94      3718\n   macro avg       0.93      0.93      0.93      3718\nweighted avg       0.94      0.94      0.94      3718\n",
-    "positive_rate_train": 0.4176304464766003,
-    "positive_rate_test": 0.41769768692845616
-  }
+    "f1": 0.7029972752043597,
+    "roc_auc": 0.838666689446618,
+    "report": "              precision    recall  f1-score   support\n\n           0       0.82      0.84      0.83       313\n           1       0.72      0.69      0.70       187\n\n    accuracy                           0.78       500\n   macro avg       0.77      0.76      0.77       500\nweighted avg       0.78      0.78      0.78       500\n",
+    "positive_rate_train": 0.374,
+    "positive_rate_test": 0.374
+  },
+  "dataset_format": "hackerearth_schema"
 }
