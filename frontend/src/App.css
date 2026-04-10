@@ -12,6 +12,11 @@
   --accent-light:  #ede9fe;
   --accent-hover:  #6d28d9;
   --accent-grad:   linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+  /* warm amber/yellow secondary */
+  --warm:          #f59e0b;
+  --warm-light:    #fef3c7;
+  --warm-border:   #fcd34d;
+  --warm-text:     #92400e;
   --radius-sm:     8px;
   --radius-md:     12px;
   --radius-lg:     16px;
@@ -1064,12 +1069,12 @@
   align-items: center;
   gap: 0.35rem;
   padding: 0.28rem 0.65rem;
-  background: var(--accent-light);
-  border: 1px solid #c4b5e8;
+  background: var(--warm-light);
+  border: 1px solid var(--warm-border);
   border-radius: 999px;
   font-size: 0.82rem;
   font-weight: 600;
-  color: var(--accent-hover);
+  color: var(--warm-text);
 }
 
 .hobby-chip-remove {
@@ -1602,9 +1607,9 @@
   gap: 0.25rem;
   font-size: 0.75rem;
   font-weight: 700;
-  color: var(--accent-hover);
-  background: var(--accent-light);
-  border: 1px solid #c4b5e8;
+  color: var(--warm-text);
+  background: var(--warm-light);
+  border: 1px solid var(--warm-border);
   border-radius: 999px;
   padding: 0.25rem 0.65rem;
 }
@@ -1779,4 +1784,430 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+}
+
+/* ─── Section divider (with label) ──────────────────────────────────────── */
+.section-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 0.5rem 0 1.25rem;
+}
+
+/* ─── Daily check-in questions ───────────────────────────────────────────── */
+.daily-qs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.daily-q-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.daily-q-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.daily-q-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.daily-q-btn {
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  border: 1.5px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s;
+  white-space: nowrap;
+  line-height: 1.4;
+}
+
+.daily-q-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-light);
+}
+
+.daily-q-btn.selected {
+  background: var(--accent-grad);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
+}
+
+/* ─── Warm accent for hero eyebrow / step alternates ─────────────────────── */
+.history-mode-badge {
+  color: var(--warm-text);
+  background: var(--warm-light);
+  border-color: var(--warm-border);
+}
+
+/* ─── No-profile nudge polish ─────────────────────────────────────────────── */
+.no-profile-nudge {
+  background: linear-gradient(135deg, var(--accent-light) 0%, var(--warm-light) 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* ─── Wellness insights polish ────────────────────────────────────────────── */
+.wellness-insights {
+  margin-top: 0.75rem;
+  padding: 0.85rem 1rem;
+  background: linear-gradient(135deg, var(--accent-light) 0%, var(--warm-light) 100%);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+/* ─── Hero eyebrow warm accent ────────────────────────────────────────────── */
+.hero-eyebrow {
+  color: var(--warm);
+  background: var(--warm-light);
+  border-color: var(--warm-border);
+}
+
+/* ─── Mobile-only sign-out (hidden on desktop) ───────────────────────────── */
+.btn-nav-signout-mobile {
+  display: none;
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.3rem 0.6rem;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MOBILE BOTTOM TAB BAR
+   ═══════════════════════════════════════════════════════════════════════════ */
+.mobile-tab-bar {
+  display: none; /* hidden on desktop */
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE — tablet & mobile
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Tablet (≤ 860px) ─────────────────────────────────────────────────────── */
+@media (max-width: 860px) {
+  .nav-user-email {
+    display: none;
+  }
+
+  .nav-user-pill {
+    padding: 0.3rem;
+    background: transparent;
+    border-color: transparent;
+  }
+
+  .hero {
+    padding: 5rem 1.25rem 3.5rem;
+  }
+
+  .dashboard {
+    padding: 1.75rem 1rem 5rem;
+  }
+
+  .dash-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-form,
+  .profile-page {
+    padding: 1.25rem 1rem;
+    max-width: 100%;
+  }
+}
+
+/* ── Mobile (≤ 640px) ─────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  /* Nav: brand + avatar only — links live in bottom bar */
+  .nav-links {
+    display: none;
+  }
+
+  .btn-nav-ghost {
+    display: none;
+  }
+
+  .btn-nav-signout-mobile {
+    display: block;
+  }
+
+  .nav-inner {
+    justify-content: space-between;
+  }
+
+  /* Show sign-out only as a small icon-less text next to avatar */
+  .nav-actions {
+    gap: 0.35rem;
+  }
+
+  /* Bottom tab bar */
+  .mobile-tab-bar {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 200;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(16px);
+    border-top: 1px solid var(--border);
+    padding: 0.4rem 0 env(safe-area-inset-bottom, 0.4rem);
+    box-shadow: 0 -4px 20px rgba(124, 58, 237, 0.08);
+  }
+
+  .mobile-tab {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.35rem 0.25rem;
+    background: none;
+    border: none;
+    font-family: inherit;
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: color 0.15s;
+  }
+
+  .mobile-tab svg {
+    width: 22px;
+    height: 22px;
+    stroke: currentColor;
+  }
+
+  .mobile-tab-active {
+    color: var(--accent);
+  }
+
+  .mobile-tab-active svg {
+    stroke: var(--accent);
+    filter: drop-shadow(0 2px 4px rgba(124, 58, 237, 0.3));
+  }
+
+  /* Add bottom padding so content doesn't hide behind tab bar */
+  .dashboard,
+  .profile-form,
+  .profile-page {
+    padding-bottom: 6rem;
+  }
+
+  /* Dashboard */
+  .dashboard {
+    padding: 1.25rem 0.875rem 6rem;
+  }
+
+  .dash-header {
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-bottom: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .dash-title {
+    font-size: 1.25rem;
+  }
+
+  /* Cards */
+  .card {
+    border-radius: var(--radius-lg);
+    padding: 1.1rem;
+  }
+
+  /* Form grid always single col */
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Daily q pill options wrap nicely */
+  .daily-q-options {
+    gap: 0.35rem;
+  }
+
+  .daily-q-btn {
+    font-size: 0.78rem;
+    padding: 0.3rem 0.7rem;
+  }
+
+  /* Mode toggle full width on mobile */
+  .mode-toggle {
+    width: 100%;
+  }
+
+  .mode-btn {
+    flex: 1;
+    text-align: center;
+    padding: 0.45rem 0.5rem;
+    font-size: 0.82rem;
+  }
+
+  /* History */
+  .history-tabs-row {
+    gap: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .history-tab {
+    white-space: nowrap;
+    padding: 0.5rem 1rem;
+  }
+
+  /* Assessment cards stack */
+  .assessment-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding: 0.875rem 1rem;
+  }
+
+  .ac-left {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: unset;
+  }
+
+  .ac-score-col {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: unset;
+  }
+
+  .ac-score-num {
+    font-size: 1.15rem;
+  }
+
+  /* Log cards */
+  .lc-header {
+    gap: 0.5rem;
+  }
+
+  .lc-edit-btn {
+    padding: 2px 8px;
+  }
+
+  /* Profile role grid */
+  .role-options {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .profile-summary-grid {
+    grid-template-columns: 1fr;
+    gap: 0.4rem;
+  }
+
+  /* Hobby + textarea */
+  .wellness-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hobby-input {
+    min-width: unset;
+    width: 100%;
+  }
+
+  /* Auth modal */
+  .auth-card {
+    padding: 1.5rem 1.25rem;
+    border-radius: var(--radius-lg);
+  }
+
+  /* Landing hero */
+  .hero {
+    padding: 4rem 1rem 2.5rem;
+  }
+
+  .hero-title {
+    font-size: 2rem;
+  }
+
+  .hero-sub {
+    font-size: 0.95rem;
+  }
+
+  .hero-cta {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .hero-cta .btn-primary,
+  .hero-cta .btn-secondary {
+    width: 100%;
+    max-width: 280px;
+  }
+
+  /* Gauge smaller */
+  .gauge-svg {
+    width: 150px;
+    height: 112px;
+  }
+
+  /* Trend bars */
+  .trend-bars {
+    gap: 4px;
+  }
+
+  /* Footer */
+  .footer-inner {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
+
+  /* Features grid already collapses at 680px */
+
+  /* Steps */
+  .steps {
+    max-width: 100%;
+  }
+
+  /* Sign out visible on mobile (btn-nav-ghost hidden, show user pill as tappable) */
+  .nav-user-pill {
+    cursor: pointer;
+  }
+}
+
+/* ── Very small (≤ 380px) ─────────────────────────────────────────────────── */
+@media (max-width: 380px) {
+  .nav-name {
+    font-size: 0.9rem;
+  }
+
+  .daily-q-btn {
+    font-size: 0.73rem;
+    padding: 0.28rem 0.55rem;
+  }
+
+  .card {
+    padding: 0.9rem;
+  }
+
+  .role-options {
+    grid-template-columns: 1fr;
+  }
 }

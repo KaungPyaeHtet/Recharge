@@ -36,7 +36,7 @@ if settings.app_env == "production":
         allow_headers=["*"],
     )
 else:
-    _dev_origins = [o.strip() for o in settings.frontend_url.split(",") if o.strip()]
+    _dev_origins = [o.strip().rstrip("/") for o in settings.frontend_url.split(",") if o.strip()]
     app.add_middleware(
         CORSMiddleware,
         allow_origins=_dev_origins,
@@ -55,7 +55,7 @@ app.include_router(profile_router)
 
 @app.get("/api/health")
 def health() -> dict[str, str]:
-    return {"status": "ok"}
+    return {"status": "ok", "env": settings.app_env}
 
 
 @app.get("/api/me")

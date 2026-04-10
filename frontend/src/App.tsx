@@ -1384,6 +1384,10 @@ function App() {
             <button className="btn-nav-ghost" onClick={handleSignOut}>
               Sign out
             </button>
+            {/* Visible only on mobile — compact sign-out */}
+            <button className="btn-nav-signout-mobile" onClick={handleSignOut}>
+              Out
+            </button>
           </div>
         </div>
       </nav>
@@ -1588,7 +1592,7 @@ function App() {
                 rows={3}
               />
               <div className="wellness-row">
-                <button type="button" className="btn-secondary" disabled={savingLog} onClick={() => void saveDailyLog()}>
+                <button type="button" className="btn-primary" disabled={savingLog} onClick={() => void saveDailyLog()}>
                   {savingLog ? "Saving…" : "Save check-in"}
                 </button>
               </div>
@@ -1604,7 +1608,7 @@ function App() {
                     <p className="no-profile-text">Set up your profile to run an analysis.</p>
                     <button
                       type="button"
-                      className="btn-secondary btn-full"
+                      className="btn-primary btn-full"
                       onClick={() => setActivePage("profile")}
                     >
                       Go to Profile
@@ -1742,6 +1746,38 @@ function App() {
           </div>
         </div>
       )}
+
+      {/* ── Mobile bottom tab bar ─────────────────────────────────────────── */}
+      <nav className="mobile-tab-bar">
+        <button
+          className={`mobile-tab ${activePage === "dashboard" ? "mobile-tab-active" : ""}`}
+          onClick={() => setActivePage("dashboard")}
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" />
+            <rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" />
+          </svg>
+          Dashboard
+        </button>
+        <button
+          className={`mobile-tab ${activePage === "history" ? "mobile-tab-active" : ""}`}
+          onClick={() => { setActivePage("history"); void loadHistory(); }}
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+          </svg>
+          History
+        </button>
+        <button
+          className={`mobile-tab ${activePage === "profile" ? "mobile-tab-active" : ""}`}
+          onClick={() => setActivePage("profile")}
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <circle cx="12" cy="8" r="4" /><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+          </svg>
+          Profile
+        </button>
+      </nav>
     </div>
   );
 }
