@@ -1707,6 +1707,30 @@ function App() {
 
                 <div className="card">
                   <h2 className="card-title">Key Contributors</h2>
+                  {burnoutResult.contributors.length > 0 && (() => {
+                    const top = burnoutResult.contributors[0];
+                    const risers = burnoutResult.contributors.filter(c => c.direction === "increases_risk");
+                    const helpers = burnoutResult.contributors.filter(c => c.direction === "decreases_risk");
+                    return (
+                      <p className="contributors-explanation">
+                        {risers.length > 0
+                          ? <>
+                              Your score is mainly driven by{" "}
+                              <strong>{cleanLabel(top.label)}</strong>
+                              {risers.length > 1 && (
+                                <> and <strong>{cleanLabel(risers[1].label)}</strong></>
+                              )}
+                              {", "}
+                              which {risers.length === 1 ? "is pushing" : "are pushing"} your risk up.
+                              {helpers.length > 0 && (
+                                <> <strong>{cleanLabel(helpers[0].label)}</strong> is helping keep it in check.</>
+                              )}
+                            </>
+                          : <>Your profile currently shows no major risk drivers.</>
+                        }
+                      </p>
+                    );
+                  })()}
                   <div className="contributors">
                     {burnoutResult.contributors.map((item) => (
                       <div
